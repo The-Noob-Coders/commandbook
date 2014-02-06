@@ -37,6 +37,7 @@ import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.ConfigurationNode;
 import com.zachsthings.libcomponents.config.Setting;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -113,17 +114,17 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         AFKComponent.AFKSession afkSession = sessions.getSession(AFKComponent.AFKSession.class, receiver);
         if (afkSession.isAFK()) {
             String status = afkSession.getIdleStatus();
-            sender.sendMessage(config.pmColor + ChatUtil.toColoredName(receiver, config.pmColor) + " is afk. "
+            sender.sendMessage(config.pmColor + ChatUtil.toColoredName(receiver, config.pmColor, sender) + " is afk. "
                     + "They might not see your message."
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
         }
 
         receiver.sendMessage(config.pmColor + "(From "
-                + ChatUtil.toColoredName(sender, config.pmColor) + "): "
+                + ChatUtil.toColoredName(sender, config.pmColor, receiver) + "): "
                 + config.pmTextColor + message);
 
         sender.sendMessage(config.pmColor + "(To "
-                + ChatUtil.toColoredName(receiver, config.pmColor) + "): "
+                + ChatUtil.toColoredName(receiver, config.pmColor, sender) + "): "
                 + config.pmTextColor + message);
 
         CommandBook.logger().info("(PM) " + ChatUtil.toColoredName(sender, ChatColor.RESET) + " -> "
@@ -175,13 +176,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 return;
             }
 
-            String name = ChatUtil.toColoredName(sender, ChatColor.YELLOW);
             String msg = args.getJoinedStrings(0);
+            BasePlugin.callEvent(new SharedMessageEvent(ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " " + msg));
 
-            BasePlugin.callEvent(
-                    new SharedMessageEvent(name + " " + msg));
-
-            BasePlugin.server().broadcastMessage("* " + name + " " + msg);
+            for(Player viewer : BasePlugin.server().getOnlinePlayers()) {
+                viewer.sendMessage("* " + ChatUtil.toColoredName(sender, ChatColor.YELLOW, viewer) + " " + msg);
+            }
         }
 
         @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)

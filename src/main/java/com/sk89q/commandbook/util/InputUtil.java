@@ -195,8 +195,8 @@ public class InputUtil {
 
                     // Match based on the positioning of the wild card
                     for (Player player : players) {
-                        String targetName = player.getName().toLowerCase();
-                        String targetDisplayName = ChatColor.stripColor(player.getDisplayName().toLowerCase());
+                        String targetName = player.getName(source).toLowerCase();
+                        String targetDisplayName = ChatColor.stripColor(player.getDisplayName(source).toLowerCase());
                         if (startWildCard && endWildCard) {
                             if (targetName.contains(filter)
                                     || (useDisplayNames && targetDisplayName.contains(filter))) {
@@ -222,9 +222,9 @@ public class InputUtil {
             List<Player> list = new ArrayList<Player>();
 
             for (Player player : players) {
-                if (player.getName().toLowerCase().startsWith(filter)
+                if (player.getName(source).toLowerCase().startsWith(filter)
                         || (useDisplayNames
-                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
+                        && ChatColor.stripColor(player.getDisplayName(source).toLowerCase()).startsWith(filter))) {
                     list.add(player);
                 }
             }
@@ -310,9 +310,9 @@ public class InputUtil {
         public static Player matchPlayerExactly(CommandSender sender, String filter) throws CommandException {
             Player[] players = CommandBook.server().getOnlinePlayers();
             for (Player player : players) {
-                if (player.getName().equalsIgnoreCase(filter)
+                if (player.getName(sender).equalsIgnoreCase(filter)
                         || (CommandBook.inst().lookupWithDisplayNames
-                        && player.getDisplayName().equalsIgnoreCase(filter))) {
+                        && player.getDisplayName(sender).equalsIgnoreCase(filter))) {
                     return player;
                 }
             }
